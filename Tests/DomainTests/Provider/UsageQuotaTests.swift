@@ -95,6 +95,77 @@ struct UsageQuotaTests {
         #expect(quota.resetTimestampDescription == "Resets soon")
     }
 
+    // MARK: - Compact Reset Time
+
+    @Test
+    func `compactResetTime shows days when 2 or more days remain`() {
+        // Given - 2 days, 3 hours from now
+        let resetDate = Date().addingTimeInterval(2 * 86400 + 3 * 3600)
+        let quota = UsageQuota(
+            percentRemaining: 60,
+            quotaType: .weekly,
+            providerId: "claude",
+            resetsAt: resetDate
+        )
+
+        // When & Then
+        #expect(quota.compactResetTime == "2d")
+    }
+
+    @Test
+    func `compactResetTime shows hours when under a day`() {
+        // Given - 3 hours, 30 minutes from now
+        let resetDate = Date().addingTimeInterval(3 * 3600 + 30 * 60)
+        let quota = UsageQuota(
+            percentRemaining: 60,
+            quotaType: .session,
+            providerId: "claude",
+            resetsAt: resetDate
+        )
+
+        // When & Then
+        #expect(quota.compactResetTime == "3h")
+    }
+
+    @Test
+    func `compactResetTime shows minutes when under an hour`() {
+        // Given - 45 minutes from now (+10s buffer to avoid rounding down)
+        let resetDate = Date().addingTimeInterval(45 * 60 + 10)
+        let quota = UsageQuota(
+            percentRemaining: 10,
+            quotaType: .session,
+            providerId: "claude",
+            resetsAt: resetDate
+        )
+
+        // When & Then
+        #expect(quota.compactResetTime == "45m")
+    }
+
+    @Test
+    func `compactResetTime shows soon when under a minute`() {
+        // Given - 30 seconds from now
+        let resetDate = Date().addingTimeInterval(30)
+        let quota = UsageQuota(
+            percentRemaining: 5,
+            quotaType: .session,
+            providerId: "claude",
+            resetsAt: resetDate
+        )
+
+        // When & Then
+        #expect(quota.compactResetTime == "soon")
+    }
+
+    @Test
+    func `compactResetTime is nil without reset date`() {
+        // Given
+        let quota = UsageQuota(percentRemaining: 60, quotaType: .session, providerId: "claude")
+
+        // When & Then
+        #expect(quota.compactResetTime == nil)
+    }
+
     @Test
     func `quota reset timestamp description is nil without reset date`() {
         // Given

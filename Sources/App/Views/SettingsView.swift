@@ -310,7 +310,7 @@ struct SettingsContentView: View {
 
     private var menuBarPercentageToggle: some View {
         HStack {
-            Text("Menu Bar Percentage")
+            Text("Show Quota and Duration in Menu Bar")
                 .font(.system(size: 12, weight: .medium, design: theme.fontDesign))
                 .foregroundStyle(theme.textSecondary)
 

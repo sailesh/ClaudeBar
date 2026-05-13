@@ -13,7 +13,12 @@ public struct MenuBarPercentageDisplay: Sendable, Equatable {
         burnRateThreshold: Double = 1.5
     ) {
         self.quota = quota
-        self.text = "\(Int(quota.displayPercent(mode: mode)))%"
+        let pct = "\(Int(quota.displayPercent(mode: mode)))%"
+        if let reset = quota.compactResetTime {
+            self.text = "\(pct) · \(reset)"
+        } else {
+            self.text = pct
+        }
         self.status = burnRateWarningEnabled
             ? quota.paceAwareStatus(burnRateThreshold: burnRateThreshold)
             : quota.status
